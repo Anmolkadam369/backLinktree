@@ -3,7 +3,8 @@ const userModel = require("../models/userModel");
 const jwt = require('jsonwebtoken');
 const verificationModel = require("../models/verificationModel");
 const nodemailer = require('nodemailer');
-const crypto = require("crypto")
+const crypto = require("crypto");
+const linkTreeModel = require("../models/linkTreeModel");
 
 
 // Create a new book
@@ -50,7 +51,7 @@ const signup = async function (req, res) {
         // ...
         if (email === "") return res.status(400).send({ status: false, message: `empty email not possible buddy` });
         if (password === "") return res.status(400).send({ status: false, message: `empty password not possible buddy` });
-        let foundUserName = await userModel.findOne({ userName: userName });
+        let foundUserName = await userModel.findOne({ userName: userName ,email:email});
         if (foundUserName) return res.status(400).send({ status: false, message: `${userName} is already used` });
         let createdData = await userModel.create(data);
         let token = jwt.sign(
@@ -62,6 +63,31 @@ const signup = async function (req, res) {
       
           res.setHeader('x-api-key', token)
         return res.status(201).send({ status: true, data: createdData, tokenData:tokenInfo });
+    } catch (error) {
+        return res.status(500).send({ status: false, message: `error ${error.message}` })
+    }
+}
+
+const signIn = async function (req, res) {
+    try {
+        console.log("some", req.body);
+        let data = req.body;
+        let { email, password } = data;
+        
+        if (email === "") return res.status(400).send({ status: false, message: `empty email not possible buddy` });
+        if (password === "") return res.status(400).send({ status: false, message: `empty password not possible buddy` });
+        let foundUserName = await userModel.findOne({ email: email });
+        if (!foundUserName) return res.status(400).send({ status: false, message: `${email} isn't available !!!` });
+        
+        let token = jwt.sign(
+            { userId: foundUserName._id, exp: Math.floor(Date.now() / 1000) + 86400 },
+            "projectlinktree"
+          );
+      
+          let tokenInfo = { userId: foundUserName._id, token: token };
+      
+          res.setHeader('x-api-key', token)
+        return res.status(201).send({ status: true, data: foundUserName, tokenData:tokenInfo });
     } catch (error) {
         return res.status(500).send({ status: false, message: `error ${error.message}` })
     }
@@ -154,4 +180,20 @@ const validation = async (req, res) => {
         return res.status(500).send({ status: false, message: `error ${error.message}` })
     }
 }
-module.exports={userNameCheck,createUserName, signup, includeName, emailVerification, validation};
+
+const createdLinkTree = async (req,res)=>{
+    try {
+        let data = req.body;
+        console.log(data)
+        let {header, wholeAddedLinks}=data;
+        if(wholeAddedLinks.length==0) return res.status(400).send({status:false, message:"atleast one link should be there"});
+        const linkTreeCreated = await linkTreeModel.create(data);
+        return res.status(200).send({ status: true, data: linkTreeCreated});
+
+    } catch (error) {
+        return res.status(500).send({ status: false, message: `error ${error.message}` })
+    }
+}
+
+
+module.exports={userNameCheck,createUserName, signup, signIn, includeName, emailVerification, validation, createdLinkTree};
