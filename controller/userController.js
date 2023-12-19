@@ -122,7 +122,7 @@ const sendMailToUser = (email, token)=>{
         from:"anmolkadam369@gmail.com",
         to:email,
         subject:"Your link Client",
-        text:`You have only one hour click on this link : https://frontend-linktree.onrender.com/checkValid/${token}`
+        text:`You have only one hour click on this link : https://frontend-linktree1.onrender.com/checkValid/${token}`
     };
 
     transporter.sendMail(mailOptions, (error, info)=>{
