@@ -51,7 +51,7 @@ const signup = async function (req, res) {
         // ...
         if (email === "") return res.status(400).send({ status: false, message: `empty email not possible buddy` });
         if (password === "") return res.status(400).send({ status: false, message: `empty password not possible buddy` });
-        const foundUserName = await userModel.findOne({ userName: userName, email: email });
+        const foundUserName = await userModel.findOne({ userName: userName, email:email });
         if (foundUserName) return res.status(400).send({ status: false, message: `you are already used` });
         let createdData = await userModel.create(data);
         let token = jwt.sign(
