@@ -10,7 +10,7 @@ router.post('/signIn', userController.signIn);
 router.put("/includeName/:userId",auth.authentication,auth.authorization, userController.includeName);
 router.post("/verification/:userId", auth.authentication,auth.authorization,userController.emailVerification);
 router.post("/verification2", userController.emailVerification);
-router.get("/validation/:token", userController.validation)
+router.post("/verifyOTP/:userId",auth.authentication,auth.authorization, userController.verifyOTP);
 router.post("/createdLinkTree",userController.createdLinkTree);
 
 
