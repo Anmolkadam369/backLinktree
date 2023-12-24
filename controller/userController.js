@@ -188,7 +188,7 @@ const verifyOTP = async (req, res) => {
     try {
         console.log("some")
        let data = req.body;
-       const {email, otp}=data;
+       let {email, otp}=data;
        console.log(otp);
        otp = otp.trim();
        let otpArray = otp.split('-');
